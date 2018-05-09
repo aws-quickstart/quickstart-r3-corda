@@ -1,37 +1,42 @@
-{
-    "baseDirectory" : "/opt/corda",
-    "emailAddress" : "__EMAILADDRESS__",
-    "extraAdvertisedServiceIds" : [],
-    "keyStorePassword" : "corda",
-    "myLegalName" : "O=__LEGALNAME__, L=, C=GB",
-    "p2pAddress" : "__IPADDRESS__:10002",
-    "rpcSettings" : {
-        "address" : "__IPADDRESS__:10003",
-        "adminAddress" : "__IPADDRESS__:10004",
-        "standAloneBroker" : false,
-        "useSsl" : false
-    },
-    "rpcUsers" : [
-        {
-            "password" : "corda",
-            "permissions" : [
-                "ALL"
-            ],
-            "username" : "corda"
-        }
-    ],
-    "trustStorePassword" : "trustpass",
-    "useTestClock" : true,
-    "webAddress" : "0.0.0.0:8080"
+myLegalName : "O=__LEGALNAME__, L=__LOCATION__, C=__COUNTRYCODE__"
+p2pAddress : "__IPADDRESS__:10002"
+compatibilityZoneURL : "__CZURL__"
+rpcSettings = {
+    address : "__IPADDRESS__:10003"
+    adminAddress : "__IPADDRESS__:10004"
+    standAloneBroker = false
+    useSsl = false
 }
-    dataSourceProperties = {
-       dataSourceClassName = "org.postgresql.ds.PGSimpleDataSource",
-       dataSource.url = "__DATASOURCE_URL__",
-       dataSource.user = __DATASOURCE_USER__",
-       dataSource.password = "__DATASOURCE_PASSWORD__",
+baseDirectory : "/opt/corda"
+emailAddress : "__EMAILADDRESS__"
+keyStorePassword : "corda"
+trustStorePassword : "trustpass"
+jarDirs = ["plugins", "cordapps"]
+rpcUsers=[
+    {
+        user=corda
+        password=corda
+        permissions=[
+            ALL
+        ]
     }
-    database = {
+]
+dataSourceProperties = {
+    dataSourceClassName = "org.postgresql.ds.PGSimpleDataSource"
+    dataSource.url = "__DATASOURCE_URL__"
+    dataSource.user = "__DATASOURCE_USER__"
+    dataSource.password = "__DATASOURCE_PASSWORD__"
+}
+database = {
     transactionIsolationLevel = READ_COMMITTED
-    schema = banka
+    schema = "__DATABASE_SCHEMA_NAME__"
     runMigration = true
+}
+enterpriseConfiguration = {
+    mutualExclusionConfiguration = {
+        on = true
+        machineName = "__MACHINENAME__"
+        updateInterval = 20000
+        waitInterval = 40000
     }
+}

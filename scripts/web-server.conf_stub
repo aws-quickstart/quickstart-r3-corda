@@ -1,0 +1,15 @@
+myLegalName : "O=__LEGALNAME__, L=__LOCATION__, C=__COUNTRYCODE__"
+rpcSettings = {
+    address : "__IPADDRESS__:10003"
+        adminAddress : "__IPADDRESS__:10004"
+}
+webAddress : "0.0.0.0:8080"
+rpcUsers=[
+    {
+        user=corda
+        password=corda_is_awesome
+        permissions=[
+            ALL
+        ]
+    }
+]
