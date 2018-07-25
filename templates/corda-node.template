@@ -521,7 +521,7 @@ Resources:
               command: bash /home/ubuntu/node-logs.sh
     CreationPolicy:
       ResourceSignal:
-        Timeout: PT5M
+        Timeout: PT15M
     Properties:
       KeyName: !Ref KeyPairName
       ImageId: !FindInMap
