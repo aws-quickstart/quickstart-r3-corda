@@ -441,6 +441,8 @@ Resources:
               command: !Sub "mkdir -p /opt/corda/sharedfs"
             02_mountfs:
               command: !Sub "mount -t nfs4 -o nfsvers=4.1 ${FileSystem}.efs.${AWS::Region}.amazonaws.com:/ /opt/corda/sharedfs"
+            03_fstab:
+              command: !Sub "echo '${FileSystem}.efs.${AWS::Region}.amazonaws.com:/ /opt/corda/sharedfs nfs4 nfsvers=4.1 0 2' >>/etc/fstab"
             03_create_artemis_on_sharedfs:
               command: !Sub "mkdir -p /opt/corda/sharedfs/artemis"
             04_create_cordapps_on_sharedfs:
@@ -621,6 +623,8 @@ Resources:
               command: !Sub "mkdir -p /opt/corda/sharedfs"
             02_mountfs:
               command: !Sub "mount -t nfs4 -o nfsvers=4.1 ${FileSystem}.efs.${AWS::Region}.amazonaws.com:/ /opt/corda/sharedfs"
+            03_fstab:
+              command: !Sub "echo '${FileSystem}.efs.${AWS::Region}.amazonaws.com:/ /opt/corda/sharedfs nfs4 nfsvers=4.1 0 2' >>/etc/fstab"
             03_link_artemis_on_sharedfs:
               command: !Sub "ln -s /opt/corda/sharedfs/artemis /opt/corda/artemis"
             04_link_cordapps_on_sharedfs:
