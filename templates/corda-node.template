@@ -464,8 +464,9 @@ Resources:
             /etc/systemd/system/corda.service:
               source: !Sub
                 - >-
-                  https://s3.amazonaws.com/${QSS3BucketName}/${QSS3KeyPrefix}scripts/corda.service
+                  https://${QSS3BucketName}.${S3Region}.amazonaws.com/${QSS3KeyPrefix}scripts/corda.service
                 - QSS3BucketName: !Ref QSS3BucketName
+                  S3Region: !If [ GovCloudCondition, s3-us-gov-west-1, s3 ]
                   QSS3KeyPrefix: !Ref QSS3KeyPrefix
               mode: '000664'
               owner: root
@@ -479,8 +480,9 @@ Resources:
             /home/ubuntu/install-node.sh:
               source: !Sub
                 - >-
-                  https://s3.amazonaws.com/${QSS3BucketName}/${QSS3KeyPrefix}scripts/install-node.sh
+                  https://${QSS3BucketName}.${S3Region}.amazonaws.com/${QSS3KeyPrefix}scripts/install-node.sh
                 - QSS3BucketName: !Ref QSS3BucketName
+                  S3Region: !If [ GovCloudCondition, s3-us-gov-west-1, s3 ]
                   QSS3KeyPrefix: !Ref QSS3KeyPrefix
               mode: '000755'
               owner: root
@@ -527,8 +529,9 @@ Resources:
             /home/ubuntu/node-logs.sh:
               source: !Sub
                 - >-
-                  https://s3.amazonaws.com/${QSS3BucketName}/${QSS3KeyPrefix}scripts/node-logs.sh
+                  https://${QSS3BucketName}.${S3Region}.amazonaws.com/${QSS3KeyPrefix}scripts/node-logs.sh
                 - QSS3BucketName: !Ref QSS3BucketName
+                  S3Region: !If [ GovCloudCondition, s3-us-gov-west-1, s3 ]
                   QSS3KeyPrefix: !Ref QSS3KeyPrefix
               mode: '000755'
               owner: root
@@ -638,8 +641,9 @@ Resources:
             /etc/systemd/system/corda.service:
               source: !Sub
                 - >-
-                  https://s3.amazonaws.com/${QSS3BucketName}/${QSS3KeyPrefix}scripts/corda.service
+                  https://${QSS3BucketName}.${S3Region}.amazonaws.com/${QSS3KeyPrefix}scripts/corda.service
                 - QSS3BucketName: !Ref QSS3BucketName
+                  S3Region: !If [ GovCloudCondition, s3-us-gov-west-1, s3 ]
                   QSS3KeyPrefix: !Ref QSS3KeyPrefix
               mode: '000664'
               owner: root
@@ -653,8 +657,9 @@ Resources:
             /home/ubuntu/install-node.sh:
               source: !Sub
                 - >-
-                  https://s3.amazonaws.com/${QSS3BucketName}/${QSS3KeyPrefix}scripts/install-cold-node.sh
+                  https://${QSS3BucketName}.${S3Region}.amazonaws.com/${QSS3KeyPrefix}scripts/install-cold-node.sh
                 - QSS3BucketName: !Ref QSS3BucketName
+                  S3Region: !If [ GovCloudCondition, s3-us-gov-west-1, s3 ]
                   QSS3KeyPrefix: !Ref QSS3KeyPrefix
               mode: '000755'
               owner: root
@@ -701,8 +706,9 @@ Resources:
             /home/ubuntu/node-logs.sh:
               source: !Sub
                 - >-
-                  https://s3.amazonaws.com/${QSS3BucketName}/${QSS3KeyPrefix}scripts/node-logs.sh
+                  https://${QSS3BucketName}.${S3Region}.amazonaws.com/${QSS3KeyPrefix}scripts/node-logs.sh
                 - QSS3BucketName: !Ref QSS3BucketName
+                  S3Region: !If [ GovCloudCondition, s3-us-gov-west-1, s3 ]
                   QSS3KeyPrefix: !Ref QSS3KeyPrefix
               mode: '000755'
               owner: root
