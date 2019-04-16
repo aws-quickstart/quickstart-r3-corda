@@ -1,7 +1,7 @@
 [submodule "submodules/quickstart-aws-vpc"]
     path = submodules/quickstart-aws-vpc
-    url = https://github.com/aws-quickstart/quickstart-aws-vpc.git
+    url = ../../aws-quickstart/quickstart-aws-vpc.git
 [submodule "submodules/quickstart-linux-utilities"]
     path = submodules/quickstart-linux-utilities
-    url = https://github.com/aws-quickstart/quickstart-linux-utilities.git
+    url = ../../aws-quickstart/quickstart-linux-utilities.git
     branch = master
