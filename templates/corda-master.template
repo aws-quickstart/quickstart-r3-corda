@@ -125,7 +125,7 @@ Parameters:
   InstanceType:
     Description: Amazon EC2 instance type for Corda nodes
     Type: String
-    Default: t2.large
+    Default: m4.large
     AllowedValues:
       - t2.large
       - r4.large
