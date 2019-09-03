@@ -27,16 +27,13 @@ Metadata:
       - Label:
           default: Corda RDS Configuration
         Parameters:
-          - DBAllocatedStorage
           - DBAutoMinorVersionUpgrade
           - DBBackupRetentionPeriod
           - DBInstanceClass
-          - DBIops
           - DBMasterUserPassword
           - DBMasterUsername
           - DBMultiAZ
           - DBName
-          - DBStorageType
       - Label:
           default: AWS Quick Start Configuration
         Parameters:
@@ -65,8 +62,6 @@ Metadata:
         default: SSH key name
       InstanceType:
         default: Corda instance type
-      AvailabilityZones:
-        default: Availability Zones
       VPCID:
         default: VPC ID
       VPCCIDR:
@@ -79,16 +74,12 @@ Metadata:
         default: Private Subnet 1 ID
       PrivateSubnet2ID:
         default: Private Subnet 2 ID
-      DBAllocatedStorage:
-        default: Database storage size (in GiB)
       DBAutoMinorVersionUpgrade:
         default: Automatic upgrade to new Amazon Aurora minor versions
       DBBackupRetentionPeriod:
         default: Database backup retention period
       DBInstanceClass:
         default: Amazon Aurora database instance type
-      DBIops:
-        default: DB IOPS
       DBMasterUserPassword:
         default: DB master password
       DBMasterUsername:
@@ -97,8 +88,6 @@ Metadata:
         default: Enable Multi-AZ deployment for database instance
       DBName:
         default: Database name
-      DBStorageType:
-        default: Database storage type
 Parameters:
   CountryCode:
     Description: The ISO 3166-1 alpha-2 code of the country to which the node is
@@ -179,14 +168,6 @@ Parameters:
   PublicSubnet2ID:
     Description: ID of the public Subnet in Availability Zone 2
     Type: AWS::EC2::Subnet::Id
-  DBAllocatedStorage:
-    ConstraintDescription: Must be between 5 and 4096 GiB. If IOPS specified, AllocatedStorage
-      must be at least 100 GiB and with minimum Iops value of 1000
-    Default: '16'
-    Description: The size of the database in gigabytes (GiB)
-    MaxValue: '4096'
-    MinValue: '5'
-    Type: Number
   DBAutoMinorVersionUpgrade:
     AllowedValues:
     - 'true'
@@ -200,32 +181,33 @@ Parameters:
     Type: String
   DBInstanceClass:
     AllowedValues:
-    - db.r4.large
-    - db.r4.xlarge
-    - db.r4.2xlarge
-    - db.r4.4xlarge
-    - db.r4.8xlarge
-    - db.r4.16xlarge
+      - db.r5.large
+      - db.r5.xlarge
+      - db.r5.2xlarge
+      - db.r5.4xlarge
+      - db.r5.12xlarge
+      - db.r5.24xlarge
+      - db.r4.large
+      - db.r4.xlarge
+      - db.r4.2xlarge
+      - db.r4.4xlarge
+      - db.r4.8xlarge
+      - db.r4.16xlarge
     ConstraintDescription: Must select a valid PostgreSQL database instance type.
     Default: db.r4.large
     Description: The name of the compute and memory capacity class of the DB instance.
     Type: String
-  DBIops:
+  DBEngineVersion:
+    Description: Select Database Engine Version
+    Type: String
+    Default: 9.6.9
     AllowedValues:
-    - '1000'
-    - '2000'
-    - '3000'
-    - '4000'
-    - '5000'
-    - '6000'
-    - '7000'
-    - '8000'
-    - '9000'
-    - '10000'
-    ConstraintDescription: '1000 IOPS min and increased in 1K increments. '
-    Default: '1000'
-    Description: DB IOPS. Used only when io1 specified for the storage type property
-    Type: Number
+      - 9.6.9
+      - 9.6.11
+      - 9.6.12
+      - 10.5
+      - 10.6
+      - 10.7  
   DBMasterUserPassword:
     AllowedPattern: (?=^.{6,255}$)((?=.*\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*
     ConstraintDescription: Must be at least 8 characters containing letters, numbers
@@ -262,14 +244,6 @@ Parameters:
     MaxLength: '64'
     MinLength: '5'
     Type: String
-  DBStorageType:
-    AllowedValues:
-    - standard
-    - gp2
-    - io1
-    Default: gp2
-    Description: The storage type associated with this database instance
-    Type: String
   VPCCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
@@ -289,24 +263,23 @@ Resources:
     Properties:
       TemplateURL:
         Fn::Sub:
-        - https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}templates/rds.template
+        - https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-amazon-aurora-postgresql/templates/aurora_postgres.template.yaml
         - QSS3Region:
             Fn::If:
             - GovCloudCondition
             - s3-us-gov-west-1
             - s3
       Parameters:
-        DBAllocatedStorage: !Ref DBAllocatedStorage
         DBAutoMinorVersionUpgrade: !Ref DBAutoMinorVersionUpgrade
         DBBackupRetentionPeriod: !Ref DBBackupRetentionPeriod
         DBInstanceClass: !Ref DBInstanceClass
         DBName: !Ref DBName
-        DBIops: !Ref DBIops
         DBMasterUsername: !Ref DBMasterUsername
         DBMasterUserPassword: !Ref DBMasterUserPassword
         DBMultiAZ: !Ref DBMultiAZ
-        DBStorageType: !Ref DBStorageType
-        Subnets: !Sub ${PrivateSubnet1ID},${PrivateSubnet2ID}
+        DBEngineVersion: !Ref DBEngineVersion
+        Subnet1ID: !Ref PrivateSubnet1ID
+        Subnet2ID: !Ref PrivateSubnet2ID
         VPCID: !Ref VPCID
   CordaNodeStack:
     Type: 'AWS::CloudFormation::Stack'
@@ -337,7 +310,6 @@ Resources:
         QSS3KeyPrefix: !Ref QSS3KeyPrefix
         VPCCIDR: !Ref VPCCIDR
         VPCID: !Ref VPCID
-        DBName: !Ref DBName
         DBMasterUsername: !Ref DBMasterUsername
         DBMasterUserPassword: !Ref DBMasterUserPassword
         RDSEndPoint: !GetAtt RDSStack.Outputs.RDSEndPoints

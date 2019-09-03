@@ -12,10 +12,6 @@ Metadata:
           - PublicSubnet2ID
           - PrivateSubnet1ID
           - PrivateSubnet2ID
-          - PrivateSubnet1CIDR
-          - PrivateSubnet2CIDR
-          - PublicSubnet1CIDR
-          - PublicSubnet2CIDR
 
       - Label:
           default: Corda Configuration
@@ -32,7 +28,6 @@ Metadata:
       - Label:
           default: Corda Database Configuration
         Parameters:
-          - DBName
           - DBMasterUsername
           - DBMasterUserPassword
           - RDSEndPoint
@@ -56,14 +51,6 @@ Metadata:
         default: Public Subnet 1 ID
       PublicSubnet2ID:
         default: Public Subnet 2 ID
-      PrivateSubnet1CIDR:
-        default: Private Subnet 1 CIDR
-      PrivateSubnet2CIDR:
-        default: Private Subnet 2 CIDR
-      PublicSubnet1CIDR:
-        default: Public Subnet 1 CIDR
-      PublicSubnet2CIDR:
-        default: Public Subnet 2 CIDR
       RDSEndPoint:
         default: Database endpoint
       DBMasterUsername:
@@ -101,9 +88,6 @@ Parameters:
     Type: String
   DBMasterUsername:
     Description: Database master username
-    Type: String
-  DBName:
-    Description: Database name
     Type: String
   OneTimeKey:
     Description: The one-time key that you received when you created a new node on
@@ -146,26 +130,6 @@ Parameters:
   PublicSubnet2ID:
     Description: ID of the public Subnet in Availability Zone 2
     Type: AWS::EC2::Subnet::Id
-  PrivateSubnet1CIDR:
-    ConstraintDescription: Must be a valid IP range in x.x.x.x/x notation
-    Default: 10.0.0.0/19
-    Description: CIDR block for private subnet 1 located in Availability Zone 1
-    Type: String
-  PrivateSubnet2CIDR:
-    ConstraintDescription: Must be a valid IP range in x.x.x.x/x notation
-    Default: 10.0.32.0/19
-    Description: CIDR block for private subnet 2 located in Availability Zone 2
-    Type: String
-  PublicSubnet1CIDR:
-    ConstraintDescription: Must be a valid IP range in x.x.x.x/x notation
-    Default: 10.0.128.0/20
-    Description: CIDR Block for the public DMZ subnet 1 located in Availability Zone 1
-    Type: String
-  PublicSubnet2CIDR:
-    ConstraintDescription: Must be a valid IP range in x.x.x.x/x notation
-    Default: 10.0.144.0/20
-    Description: CIDR Block for the public DMZ subnet 2 located in Availability Zone 2
-    Type: String
   QSS3BucketName:
     AllowedPattern: '^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$'
     ConstraintDescription: >-
@@ -278,8 +242,8 @@ Resources:
       GroupDescription: Security group for mount target
       SecurityGroupIngress:
       - IpProtocol: tcp
-        FromPort: '2049'
-        ToPort: '2049'
+        FromPort: 2049
+        ToPort: 2049
         CidrIp: !Ref VPCCIDR
   MountTargetS1:
     Type: AWS::EFS::MountTarget
@@ -298,19 +262,19 @@ Resources:
   CordaLogGroup:
     Type: 'AWS::Logs::LogGroup'
     Properties:
+      RetentionInDays: 7
       LogGroupName: !Join
         - '-'
         - - !Ref 'AWS::StackName'
           - 'Corda1-Logs'
-      RetentionInDays: 7
   ColdCordaLogGroup:
     Type: 'AWS::Logs::LogGroup'
     Properties:
+      RetentionInDays: 7
       LogGroupName: !Join
         - '-'
         - - !Ref 'AWS::StackName'
           - 'Corda2-Logs'
-      RetentionInDays: 7
   CordaInstanceRole:
     Type: 'AWS::IAM::Role'
     Properties:
@@ -352,12 +316,6 @@ Resources:
                 Action:
                   - 'elasticloadbalancing:RegisterInstancesWithLoadBalancer'
                 Resource: '*'
-  CordaInstanceProfile:
-    Type: 'AWS::IAM::InstanceProfile'
-    Properties:
-      Path: /
-      Roles:
-        - !Ref CordaInstanceRole
   CordaSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
@@ -365,20 +323,20 @@ Resources:
       VpcId: !Ref VPCID
       SecurityGroupIngress:
         - IpProtocol: tcp
-          FromPort: '22'
-          ToPort: '22'
+          FromPort: 22
+          ToPort: 22
           CidrIp: !Ref RemoteAccessCIDR
         - IpProtocol: tcp
-          FromPort: '10002'
-          ToPort: '10002'
+          FromPort: 10002
+          ToPort: 10002
           CidrIp: !Ref CordaAccessCIDR
         - IpProtocol: tcp
-          FromPort: '10003'
-          ToPort: '10003'
+          FromPort: 10003
+          ToPort: 10003
           CidrIp: !Ref CordaRPCAccessCIDR
         - IpProtocol: icmp
-          FromPort: '-1'
-          ToPort: '-1'
+          FromPort: -1
+          ToPort: -1
           CidrIp: !Ref RemoteAccessCIDR
   P2PLoadBalancer:
     Type: 'AWS::ElasticLoadBalancing::LoadBalancer'
@@ -387,16 +345,16 @@ Resources:
         - !Ref PublicSubnet1ID
         - !Ref PublicSubnet2ID
       Listeners:
-        - LoadBalancerPort: 10002
-          InstancePort: 10002
+        - LoadBalancerPort: '10002'
+          InstancePort: '10002'
           Protocol: TCP
           InstanceProtocol: TCP
       HealthCheck:
         Target: TCP:10002
-        HealthyThreshold: 3
-        UnhealthyThreshold: 5
-        Interval: 30
-        Timeout: 5
+        HealthyThreshold: '3'
+        UnhealthyThreshold: '5'
+        Interval: '30'
+        Timeout: '5'
       SecurityGroups:
         - !Ref CordaSecurityGroup
   RPCLoadBalancer:
@@ -406,24 +364,50 @@ Resources:
         - !Ref PublicSubnet1ID
         - !Ref PublicSubnet2ID
       Listeners:
-        - LoadBalancerPort: 10003
-          InstancePort: 10003
+        - LoadBalancerPort: '10003'
+          InstancePort: '10003'
           Protocol: TCP
           InstanceProtocol: TCP
       HealthCheck:
         Target: TCP:10003
-        HealthyThreshold: 3
-        UnhealthyThreshold: 5
-        Interval: 30
-        Timeout: 5
+        HealthyThreshold: '3'
+        UnhealthyThreshold: '5'
+        Interval: '30'
+        Timeout: '5'
       SecurityGroups:
         - !Ref CordaSecurityGroup
+  CordaInstanceProfile: 
+    Type: 'AWS::IAM::InstanceProfile'
+    Properties: 
+      Path: '/'
+      Roles: 
+        - Ref: 'CordaInstanceRole'
+  AuthenticatedS3Policy:
+    Type: AWS::IAM::Policy
+    Properties:
+        PolicyName: AuthenticatedS3GetObjects
+        Roles: 
+        - !Ref CordaInstanceRole
+        PolicyDocument:
+           Statement:
+             - Sid: BucketAccess
+               Effect: Allow
+               Action:
+                 - 's3:GetObject'
+               Resource: !Sub arn:aws:s3:::${QSS3BucketName}/*
   CordaInstance:
     Type: 'AWS::EC2::Instance'
     DependsOn:
       - FileSystem
     Metadata:
-      'AWS::CloudFormation::Init':
+      AWS::CloudFormation::Authentication: 
+        S3AccessCreds: 
+          type: S3
+          buckets: 
+            - !Sub ${QSS3BucketName}
+          roleName: 
+            Ref: CordaInstanceRole
+      AWS::CloudFormation::Init:
         configSets:
           corda_install:
             - mount-sharedfs
@@ -438,27 +422,27 @@ Resources:
               nfs-common: []
           commands:
             01_createdir:
-              command: !Sub "mkdir -p /opt/corda/sharedfs"
+              command: "mkdir -p /opt/corda/sharedfs"
             02_mountfs:
               command: !Sub "mount -t nfs4 -o nfsvers=4.1 ${FileSystem}.efs.${AWS::Region}.amazonaws.com:/ /opt/corda/sharedfs"
             03_fstab:
               command: !Sub "echo '${FileSystem}.efs.${AWS::Region}.amazonaws.com:/ /opt/corda/sharedfs nfs4 nfsvers=4.1 0 2' >>/etc/fstab"
             03_create_artemis_on_sharedfs:
-              command: !Sub "mkdir -p /opt/corda/sharedfs/artemis"
+              command: "mkdir -p /opt/corda/sharedfs/artemis"
             04_create_cordapps_on_sharedfs:
-              command: !Sub "mkdir -p /opt/corda/sharedfs/cordapps"
+              command: "mkdir -p /opt/corda/sharedfs/cordapps"
             05_create_drivers_on_sharedfs:
-              command: !Sub "mkdir -p /opt/corda/sharedfs/drivers"
+              command: "mkdir -p /opt/corda/sharedfs/drivers"
             06_create_plugins_on_sharedfs:
-              command: !Sub "mkdir -p /opt/corda/sharedfs/plugins"
+              command: "mkdir -p /opt/corda/sharedfs/plugins"
             07_link_artemis_on_sharedfs:
-              command: !Sub "ln -s /opt/corda/sharedfs/artemis /opt/corda/artemis"
+              command: "ln -s /opt/corda/sharedfs/artemis /opt/corda/artemis"
             08_link_cordapps_on_sharedfs:
-              command: !Sub "ln -s /opt/corda/sharedfs/cordapps /opt/corda/cordapps"
+              command: "ln -s /opt/corda/sharedfs/cordapps /opt/corda/cordapps"
             09_link_drivers_on_sharedfs:
-              command: !Sub "ln -s /opt/corda/sharedfs/drivers /opt/corda/drivers"
+              command: "ln -s /opt/corda/sharedfs/drivers /opt/corda/drivers"
             10_link_plugins_on_sharedfs:
-              command: !Sub "ln -s /opt/corda/sharedfs/drivers /opt/corda/plugins"
+              command: "ln -s /opt/corda/sharedfs/drivers /opt/corda/plugins"
         systemd-config-corda:
           files:
             /etc/systemd/system/corda.service:
@@ -471,6 +455,7 @@ Resources:
               mode: '000664'
               owner: root
               group: root
+              authentication: S3AccessCreds
         corda-jar:
           packages:
             apt:
@@ -487,6 +472,7 @@ Resources:
               mode: '000755'
               owner: root
               group: root
+              authentication: S3AccessCreds
         run-install:
           commands:
             start_install:
@@ -511,7 +497,6 @@ Resources:
                 CountryCode: !Ref CountryCode
                 Location: !Ref Location
                 RDSEndPoint: !Ref RDSEndPoint
-                DBName: !Ref DBName
                 DBMasterUsername: !Ref DBMasterUsername
                 DBMasterUserPassword: !Ref DBMasterUserPassword
                 OneTimeKey: !Ref OneTimeKey
@@ -536,6 +521,7 @@ Resources:
               mode: '000755'
               owner: root
               group: root
+              authentication: S3AccessCreds
           commands:
             setup-cw-logs :
               command: bash /home/ubuntu/node-logs.sh
@@ -552,7 +538,7 @@ Resources:
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:
-            VolumeSize: '100'
+            VolumeSize: 100
       SecurityGroupIds:
         - !Ref CordaSecurityGroup
       SubnetId: !Ref PublicSubnet1ID
@@ -623,19 +609,19 @@ Resources:
               nfs-common: []
           commands:
             01_createdir:
-              command: !Sub "mkdir -p /opt/corda/sharedfs"
+              command: "mkdir -p /opt/corda/sharedfs"
             02_mountfs:
-              command: !Sub "mount -t nfs4 -o nfsvers=4.1 ${FileSystem}.efs.${AWS::Region}.amazonaws.com:/ /opt/corda/sharedfs"
+              command: "mount -t nfs4 -o nfsvers=4.1 ${FileSystem}.efs.${AWS::Region}.amazonaws.com:/ /opt/corda/sharedfs"
             03_fstab:
-              command: !Sub "echo '${FileSystem}.efs.${AWS::Region}.amazonaws.com:/ /opt/corda/sharedfs nfs4 nfsvers=4.1 0 2' >>/etc/fstab"
+              command: "echo '${FileSystem}.efs.${AWS::Region}.amazonaws.com:/ /opt/corda/sharedfs nfs4 nfsvers=4.1 0 2' >>/etc/fstab"
             03_link_artemis_on_sharedfs:
-              command: !Sub "ln -s /opt/corda/sharedfs/artemis /opt/corda/artemis"
+              command: "ln -s /opt/corda/sharedfs/artemis /opt/corda/artemis"
             04_link_cordapps_on_sharedfs:
-              command: !Sub "ln -s /opt/corda/sharedfs/cordapps /opt/corda/cordapps"
+              command: "ln -s /opt/corda/sharedfs/cordapps /opt/corda/cordapps"
             05_link_drivers_on_sharedfs:
-              command: !Sub "ln -s /opt/corda/sharedfs/drivers /opt/corda/drivers"
+              command: "ln -s /opt/corda/sharedfs/drivers /opt/corda/drivers"
             06_link_plugins_on_sharedfs:
-              command: !Sub "ln -s /opt/corda/sharedfs/drivers /opt/corda/plugins"
+              command: "ln -s /opt/corda/sharedfs/drivers /opt/corda/plugins"
         systemd-config-corda:
           files:
             /etc/systemd/system/corda.service:
@@ -648,6 +634,7 @@ Resources:
               mode: '000664'
               owner: root
               group: root
+              authentication: S3AccessCreds
         corda-jar:
           packages:
             apt:
@@ -664,6 +651,7 @@ Resources:
               mode: '000755'
               owner: root
               group: root
+              authentication: S3AccessCreds
         run-install:
           commands:
             start_install:
@@ -688,7 +676,6 @@ Resources:
                 CountryCode: !Ref CountryCode
                 Location: !Ref Location
                 RDSEndPoint: !Ref RDSEndPoint
-                DBName: !Ref DBName
                 DBMasterUsername: !Ref DBMasterUsername
                 DBMasterUserPassword: !Ref DBMasterUserPassword
                 OneTimeKey: !Ref OneTimeKey
@@ -713,6 +700,7 @@ Resources:
               mode: '000755'
               owner: root
               group: root
+              authentication: S3AccessCreds
           commands:
             setup-cw-logs :
               command: bash /home/ubuntu/node-logs.sh
@@ -729,7 +717,7 @@ Resources:
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
           Ebs:
-            VolumeSize: '100'
+            VolumeSize: 100
       SecurityGroupIds:
         - !Ref CordaSecurityGroup
       SubnetId: !Ref PublicSubnet2ID

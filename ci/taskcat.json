@@ -17,7 +17,7 @@
     },
     {
         "ParameterKey": "QSS3BucketName",
-        "ParameterValue": "aws-quickstart"
+        "ParameterValue": "$[taskcat_autobucket]"
     },
     {
         "ParameterKey": "QSS3KeyPrefix",
@@ -37,7 +37,7 @@
     },
     {
         "ParameterKey": "DBMasterUserPassword",
-        "ParameterValue": "$[taskcat_genpass_8A]"
+        "ParameterValue": "_$[taskcat_genpass_8A]"
     },
     {
         "ParameterKey": "DBMultiAZ",

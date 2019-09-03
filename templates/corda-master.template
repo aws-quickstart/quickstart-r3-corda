@@ -26,16 +26,13 @@ Metadata:
       - Label:
           default: Corda RDS Configuration
         Parameters:
-          - DBAllocatedStorage
           - DBAutoMinorVersionUpgrade
           - DBBackupRetentionPeriod
           - DBInstanceClass
-          - DBIops
           - DBMasterUserPassword
           - DBMasterUsername
           - DBMultiAZ
           - DBName
-          - DBStorageType
       - Label:
           default: AWS Quick Start Configuration
         Parameters:
@@ -72,20 +69,14 @@ Metadata:
         default: Number of used Availability Zones
       AvailabilityZones:
         default: Availability Zones
-      VPCID:
-        default: VPC ID
       VPCCIDR:
         default: VPC CIDR
-      DBAllocatedStorage:
-        default: Database storage size (in GiB)
       DBAutoMinorVersionUpgrade:
         default: Automatic upgrade to new Amazon Aurora minor versions
       DBBackupRetentionPeriod:
         default: Database backup retention period
       DBInstanceClass:
         default: Amazon Aurora database instance type
-      DBIops:
-        default: Database IOPS
       DBMasterUserPassword:
         default: Database master password
       DBMasterUsername:
@@ -94,8 +85,6 @@ Metadata:
         default: Enable Multi-AZ deployment for database instance
       DBName:
         default: Database name
-      DBStorageType:
-        default: Database storage type
 Parameters:
   AvailabilityZones:
     Description: List of Availability Zones to use for the subnets in the VPC. Only two
@@ -171,14 +160,6 @@ Parameters:
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/x
     Description: Allowed CIDR block for Corda RPC access
     Type: String
-  DBAllocatedStorage:
-    ConstraintDescription: Must be between 5 and 4096 GiB. If IOPS specified, AllocatedStorage
-      must be at least 100 GiB and with minimum IOPS value of 1000
-    Default: '16'
-    Description: The size of the database in gigabytes (GiB)
-    MaxValue: '4096'
-    MinValue: '5'
-    Type: Number
   DBAutoMinorVersionUpgrade:
     AllowedValues:
     - 'true'
@@ -202,22 +183,6 @@ Parameters:
     Default: db.r4.large
     Description: The name of the compute and memory capacity class of the DB instance.
     Type: String
-  DBIops:
-    AllowedValues:
-    - '1000'
-    - '2000'
-    - '3000'
-    - '4000'
-    - '5000'
-    - '6000'
-    - '7000'
-    - '8000'
-    - '9000'
-    - '10000'
-    ConstraintDescription: '1000 IOPS min and increased in 1K increments. '
-    Default: '1000'
-    Description: DB IOPS. Used only when io1 specified for the storage type property
-    Type: Number
   DBMasterUserPassword:
     AllowedPattern: (?=^.{6,255}$)((?=.*\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*
     ConstraintDescription: Must be at least 8 characters containing letters, numbers
@@ -253,14 +218,6 @@ Parameters:
     Description: Name of Corda Quick Start database.
     MaxLength: '64'
     MinLength: '5'
-    Type: String
-  DBStorageType:
-    AllowedValues:
-    - standard
-    - gp2
-    - io1
-    Default: gp2
-    Description: The storage type associated with this database instance
     Type: String
   QSS3KeyPrefix:
     AllowedPattern: '^[0-9a-zA-Z-/]*$'
@@ -308,7 +265,7 @@ Resources:
         AvailabilityZones: !Join
           - ','
           - !Ref AvailabilityZones
-        CreatePrivateSubnets: true
+        CreatePrivateSubnets: 'true'
         KeyPairName: !Ref KeyPairName
         NumberOfAZs: !Ref NumberOfAZs
         PublicSubnet1CIDR: !Ref PublicSubnet1CIDR
@@ -316,7 +273,6 @@ Resources:
         VPCCIDR: !Ref VPCCIDR
   CordaStack:
     Type: 'AWS::CloudFormation::Stack'
-    DependsOn: VPCStack
     Properties:
       TemplateURL:
         Fn::Sub:
@@ -327,18 +283,15 @@ Resources:
             - s3-us-gov-west-1
             - s3
       Parameters:
-        CordaAccessCIDR: !Ref RemoteAccessCIDR
+        CordaAccessCIDR: !Ref CordaAccessCIDR
         CordaRPCAccessCIDR: !Ref CordaRPCAccessCIDR
-        DBAllocatedStorage: !Ref DBAllocatedStorage
         DBAutoMinorVersionUpgrade: !Ref DBAutoMinorVersionUpgrade
         DBBackupRetentionPeriod: !Ref DBBackupRetentionPeriod
         DBInstanceClass: !Ref DBInstanceClass
-        DBIops: !Ref DBIops
         DBMasterUserPassword: !Ref DBMasterUserPassword
         DBMasterUsername: !Ref DBMasterUsername
         DBMultiAZ: !Ref DBMultiAZ
         DBName: !Ref DBName
-        DBStorageType: !Ref DBStorageType
         InstanceType: !Ref InstanceType
         KeyPairName: !Ref KeyPairName
         CountryCode: !Ref CountryCode
