@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: 'Corda Infrastructure - Corda Node, License: Apache 2.0 (Please do not remove) Aug,15,2018 (qs-1odje6ci1)'
 Metadata:
-  'AWS::CloudFormation::Interface':
+  AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
           default: Network Configuration
@@ -117,7 +117,7 @@ Parameters:
   KeyPairName:
     Description: Enter a public/private key pair. If you do not have one in this region,
       please create it before continuing
-    Type: 'AWS::EC2::KeyPair::KeyName'
+    Type: AWS::EC2::KeyPair::KeyName
   PrivateSubnet1ID:
     Description: ID of the private Subnet in Availability Zone 1
     Type: AWS::EC2::Subnet::Id
@@ -260,7 +260,7 @@ Resources:
       SecurityGroups:
       - Ref: MountTargetSecurityGroup
   CordaLogGroup:
-    Type: 'AWS::Logs::LogGroup'
+    Type: AWS::Logs::LogGroup
     Properties:
       RetentionInDays: 7
       LogGroupName: !Join
@@ -317,7 +317,7 @@ Resources:
                   - 'elasticloadbalancing:RegisterInstancesWithLoadBalancer'
                 Resource: '*'
   CordaSecurityGroup:
-    Type: 'AWS::EC2::SecurityGroup'
+    Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Enables P2P, RPC and SSH access
       VpcId: !Ref VPCID
@@ -339,7 +339,7 @@ Resources:
           ToPort: -1
           CidrIp: !Ref RemoteAccessCIDR
   P2PLoadBalancer:
-    Type: 'AWS::ElasticLoadBalancing::LoadBalancer'
+    Type: AWS::ElasticLoadBalancing::LoadBalancer
     Properties:
       Subnets:
         - !Ref PublicSubnet1ID
@@ -358,7 +358,7 @@ Resources:
       SecurityGroups:
         - !Ref CordaSecurityGroup
   RPCLoadBalancer:
-    Type: 'AWS::ElasticLoadBalancing::LoadBalancer'
+    Type: AWS::ElasticLoadBalancing::LoadBalancer
     Properties:
       Subnets:
         - !Ref PublicSubnet1ID
@@ -377,7 +377,7 @@ Resources:
       SecurityGroups:
         - !Ref CordaSecurityGroup
   CordaInstanceProfile: 
-    Type: 'AWS::IAM::InstanceProfile'
+    Type: AWS::IAM::InstanceProfile
     Properties: 
       Path: '/'
       Roles: 
@@ -396,7 +396,7 @@ Resources:
                  - 's3:GetObject'
                Resource: !Sub arn:aws:s3:::${QSS3BucketName}/*
   CordaInstance:
-    Type: 'AWS::EC2::Instance'
+    Type: AWS::EC2::Instance
     DependsOn:
       - FileSystem
     Metadata:
@@ -591,10 +591,10 @@ Resources:
             [ $(qs_status) == 0 ] && cfn_success || cfn_fail
           - S3Region: !If [ GovCloudCondition, s3-us-gov-west-1, s3 ]
   CordaColdInstance:
-    Type: 'AWS::EC2::Instance'
+    Type: AWS::EC2::Instance
     DependsOn: CordaInstance
     Metadata:
-      'AWS::CloudFormation::Init':
+      AWS::CloudFormation::Init:
         configSets:
           corda_install:
             - mount-sharedfs
