@@ -114,7 +114,7 @@ Parameters:
        - m4.xlarge
        - m4.2xlarge
        - m4.4xlarge
-    Default: t2.large
+    Default: t3.large
     Description: Amazon EC2 instance type for the Corda instances
     Type: String
   KeyPairName:
