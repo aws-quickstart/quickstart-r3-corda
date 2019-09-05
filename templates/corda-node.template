@@ -104,6 +104,9 @@ Parameters:
        - t2.small
        - t2.medium
        - t2.large
+       - t3.small
+       - t3.medium
+       - t3.large
        - m3.large
        - m3.xlarge
        - m3.2xlarge
@@ -111,7 +114,7 @@ Parameters:
        - m4.xlarge
        - m4.2xlarge
        - m4.4xlarge
-    Default: m4.large
+    Default: t3.large
     Description: Amazon EC2 instance type for the Corda instances
     Type: String
   KeyPairName:
@@ -452,7 +455,7 @@ Resources:
                 - QSS3BucketName: !Ref QSS3BucketName
                   S3Region: !If [ GovCloudCondition, s3-us-gov-west-1, s3 ]
                   QSS3KeyPrefix: !Ref QSS3KeyPrefix
-              mode: '000664'
+              mode: '000755'
               owner: root
               group: root
               authentication: S3AccessCreds
@@ -594,6 +597,13 @@ Resources:
     Type: AWS::EC2::Instance
     DependsOn: CordaInstance
     Metadata:
+      AWS::CloudFormation::Authentication: 
+        S3AccessCreds: 
+          type: S3
+          buckets: 
+            - !Sub ${QSS3BucketName}
+          roleName: 
+            Ref: CordaInstanceRole
       AWS::CloudFormation::Init:
         configSets:
           corda_install:
@@ -631,7 +641,7 @@ Resources:
                 - QSS3BucketName: !Ref QSS3BucketName
                   S3Region: !If [ GovCloudCondition, s3-us-gov-west-1, s3 ]
                   QSS3KeyPrefix: !Ref QSS3KeyPrefix
-              mode: '000664'
+              mode: '000755'
               owner: root
               group: root
               authentication: S3AccessCreds
@@ -641,7 +651,7 @@ Resources:
               openjdk-8-jdk: []
               wget: []
           files:
-            /home/ubuntu/install-node.sh:
+            /home/ubuntu/install-node-cold-node.sh:
               source: !Sub
                 - >-
                   https://${QSS3BucketName}.${S3Region}.amazonaws.com/${QSS3KeyPrefix}scripts/install-cold-node.sh
@@ -657,7 +667,7 @@ Resources:
             start_install:
               command: !Sub
               - >-
-                bash /home/ubuntu/install-node.sh \
+                bash /home/ubuntu/install-node-cold-node.sh \
                   "${P2PAddress}" \
                   "${CountryCode}" \
                   "${Location}" \
