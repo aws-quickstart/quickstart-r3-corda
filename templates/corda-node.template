@@ -111,7 +111,7 @@ Parameters:
     Type: String
   TestnetEndpoint:
     Description: The base URL of Corda Testnet
-    Default: https://testnet.corda.network
+    Default: https://onboarder.prod.ws.r3.com
     Type: String
   InstanceType:
     AllowedValues:
