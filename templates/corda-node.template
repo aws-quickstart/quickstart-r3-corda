@@ -95,7 +95,7 @@ Parameters:
     Type: String
   TestnetEndpoint:
     Description: The base URL of Corda Testnet
-    Default: https://testnet.corda.network
+    Default: https://onboarder.prod.ws.r3.com
     Type: String
   InstanceType:
     AllowedValues:
@@ -379,17 +379,17 @@ Resources:
         Timeout: '5'
       SecurityGroups:
         - !Ref CordaSecurityGroup
-  CordaInstanceProfile: 
+  CordaInstanceProfile:
     Type: AWS::IAM::InstanceProfile
-    Properties: 
+    Properties:
       Path: '/'
-      Roles: 
+      Roles:
         - Ref: 'CordaInstanceRole'
   AuthenticatedS3Policy:
     Type: AWS::IAM::Policy
     Properties:
         PolicyName: AuthenticatedS3GetObjects
-        Roles: 
+        Roles:
         - !Ref CordaInstanceRole
         PolicyDocument:
            Statement:
@@ -403,12 +403,12 @@ Resources:
     DependsOn:
       - FileSystem
     Metadata:
-      AWS::CloudFormation::Authentication: 
-        S3AccessCreds: 
+      AWS::CloudFormation::Authentication:
+        S3AccessCreds:
           type: S3
-          buckets: 
+          buckets:
             - !Sub ${QSS3BucketName}
-          roleName: 
+          roleName:
             Ref: CordaInstanceRole
       AWS::CloudFormation::Init:
         configSets:
@@ -597,12 +597,12 @@ Resources:
     Type: AWS::EC2::Instance
     DependsOn: CordaInstance
     Metadata:
-      AWS::CloudFormation::Authentication: 
-        S3AccessCreds: 
+      AWS::CloudFormation::Authentication:
+        S3AccessCreds:
           type: S3
-          buckets: 
+          buckets:
             - !Sub ${QSS3BucketName}
-          roleName: 
+          roleName:
             Ref: CordaInstanceRole
       AWS::CloudFormation::Init:
         configSets:
