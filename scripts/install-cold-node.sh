@@ -1,5 +1,5 @@
 #!/bin/bash
-# 11/07/2019
+# 11/07/2019 22:54
 
 set -euo pipefail
 
@@ -92,8 +92,7 @@ cp "/opt/corda/sharedfs/corda.zip" "/opt/corda/"
 
 log "Unpacking distribution ..."
 
-sudo rm -rf certificates
-sudo unzip /opt/corda/corda.zip 2> /dev/null || error "Unable to unzip generated node bundle; was the correct one time download key used?"
+sudo unzip -o /opt/corda/corda.zip || error "Unable to unzip generated node bundle; was the correct one time download key used?"
 
 log "Setting permissions for node directories ..."
 
