@@ -4,8 +4,8 @@
 [submodule "submodules/quickstart-linux-utilities"]
     path = submodules/quickstart-linux-utilities
     url = ../../aws-quickstart/quickstart-linux-utilities.git
-    branch = master
+    branch = main
 [submodule "submodules/quickstart-amazon-aurora-postgresql"]
 	path = submodules/quickstart-amazon-aurora-postgresql
 	url = git@github.com:aws-quickstart/quickstart-amazon-aurora-postgresql.git
-	branch = master
+	branch = main
