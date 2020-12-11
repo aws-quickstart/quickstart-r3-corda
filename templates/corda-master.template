@@ -1,6 +1,9 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: 'Corda + QuickStart VPC, License: Apache 2.0 (Please do not remove) Aug,15,2018 (qs-1odje6ci6)'
 Metadata:
+  QuickStartDocumentation:
+    EntrypointName: "Launch into a new VPC"
+    Order: "1"
   'AWS::CloudFormation::Interface':
     ParameterGroups:
       - Label:

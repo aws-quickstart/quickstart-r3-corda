@@ -1,6 +1,9 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: 'Corda Infrastructure - Corda Node, License: Apache 2.0 (Please do not remove) Aug,15,2018 (qs-1odje6ci1)'
 Metadata:
+  QuickStartDocumentation:
+    EntrypointName: "Launch into an existing VPC"
+    Order: "2"
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
