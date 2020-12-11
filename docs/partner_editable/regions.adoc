@@ -1,6 +1,16 @@
 This Quick Start supports the following Regions:
 
-* us-east-1, US East (N. Virginia) (EXAMPLE)
-* us-east-2, US East (Ohio) (EXAMPLE)
+* us-east-1 (N. Virginia)
+* us-east-2 (Ohio)
+* us-west-1 (N. California)
+* us-west-2 (Oregon)
+* eu-west-1 (Ireland)
+* eu-west-2 (London)
+* eu-central-1 (Frankfurt)
+* ca-central-1 (Canada Central)
+* ap-northeast-1 (Tokyo)
+* ap-northeast-2 (Seoul)
+* ap-southeast-1 (Singapore)
+* ap-southeast-2 (Sydney)
 
 //Full list: https://docs.aws.amazon.com/general/latest/gr/rande.html

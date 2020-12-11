@@ -1,13 +1,5 @@
 // If no preperation is required, remove all content from here
 
-==== Prepare your AWS account
-
-_Describe any setup required in the AWS account prior to template launch_
-
-==== Prepare your {partner-company-name} account
-
-_Describe any setup required in the partner portal/account prior to template launch_
-
 ==== Prepare for the deployment
 
-_Describe any preparation required to complete the product build, such as obtaining licenses or placing files in S3_
+This Quick Start will create a deployment of a single logical Corda node. This Corda node will need to connect to a Corda network of other Corda nodes in order to transact. By default, the template is configured for connection to the Corda Testnet. To provision your AWS based node to this Testnet, you will need a ONE-TIME KEY, which you can obtain by signing up for the Corda Testnet at http://testnet.corda.network/ and creating a node (the key is valid for one hour). After you have obtained the key, paste it into the *One-time key* parameter field in the template. Your node will automatically provision and connect to Testnet when you run the template.

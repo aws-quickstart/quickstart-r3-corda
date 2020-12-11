@@ -3,4 +3,15 @@
 // Include links if helpful. 
 // You don't need to list AWS services or point to general info about AWS; the boilerplate already covers this.
 
-This Quick Start also assumes familiarity with <knowledge expectations specific to this Quick Start>.
+Before you deploy this Quick Start, we recommend that you become familiar with the following AWS services. (If you are new to AWS, see https://aws.amazon.com/getting-started/[Getting Started with AWS].)
+
+* https://aws.amazon.com/documentation/ec2/[Amazon EC2]
+* https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AmazonEBS.html[Amazon EBS]
+* https://aws.amazon.com/documentation/vpc/[Amazon VPC]
+* https://aws.amazon.com/documentation/cloudformation/[AWS CloudFormation]
+* https://aws.amazon.com/rds/postgresql/[Amazon RDS for PostgreSQL]
+* https://aws.amazon.com/elasticloadbalancing/[Elastic Load Balancing]
+* https://aws.amazon.com/efs/[Amazon Elastic File System]
+* https://aws.amazon.com/cloudwatch/[Amazon CloudWatch]
+
+We recommend that you also become familiar with Corda mailto:http://docs.corda.r3.com/key-concepts.html[key concepts] including mailto:http://docs.corda.r3.com/key-concepts-node.html[Corda nodes].

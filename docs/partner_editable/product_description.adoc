@@ -2,4 +2,8 @@
 // Briefly describe the software. Use consistent and clear branding. 
 // Include the benefits of using the software on AWS, and provide details on usage scenarios.
 
-<Describe how the software works on AWS.>
+Corda is a blockchain technology platform built to transform the way the world does business. Using smart contract and blockchain technology, Corda allows existing business networks to reduce transaction and record-keeping costs and to streamline business operations. Corda was designed to meet the highest standards of the most complex and highly regulated industries in the world. Specifically, Corda is designed to address the privacy and scalability concerns of traditional public blockchain systems while maintaining the global interoperability needed to power real world commerce.
+
+Corda on AWS is a production-ready implementation of a Corda node, which offers built-in resilience and high availability and which can scale as the needs of the node operator change.
+
+This Quick Start is for IT infrastructure architects, administrators, DevOps professionals, CorDapp developers, or business users who are planning to implement a Corda node deployment on the AWS Cloud.

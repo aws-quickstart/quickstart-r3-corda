@@ -1,4 +1,27 @@
 // We need to work around Step numbers here if we are going to potentially exclude the AMI subscription
+=== Instance Selection
+
+Minimum recommended specification for a Corda instance type is a t2.large, which is set as the default. (For more information on instance types, see the https://aws.amazon.com/ec2/instance-types/[AWS Website].) If you want more performance—for example to make use of the multi-threading performance available with Corda—you can choose from a number of instance types in the Quick Start parameters. The Corda software will automatically scale the number of threads to the available virtual CPUs (vCPUs), with 4 threads per vCPU.
+
+The following table gives an indication of the performance gain of adding vCPUs.
+
+[cols=",,,",options="header",]
+|=========================================================
+|# vCPUs |Thread count |Transactions per second (Issue) a|
+Transactions per second
+
+(Issue+Pay)
+
+|1 |4 |90 |14
+|2 |8 |100 |22
+|4 |16 |225 |46
+|8 |32 |350 |70
+|16 |64 |730 |130
+|32 |128 |1001 |205
+|=========================================================
+
+For more information about Issue+Pay, see the http://docs.corda.r3.com/key-concepts-transactions.html#overview[Corda documentation].
+
 === Sign in to your AWS account
 
 . Sign in to your AWS account at https://aws.amazon.com with an IAM user role that has the necessary permissions. For details, see link:#_planning_the_deployment[Planning the deployment] earlier in this guide.

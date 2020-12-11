@@ -20,7 +20,7 @@ tests:
       CountryCode: GB
       DBMasterUserPassword: _$[taskcat_genpass_8A]
       DBMultiAZ: 'false'
-      KeyPairName: taskcat
+      KeyPairName: $[taskcat_getkeypair]
       Location: London
       OneTimeKey: ''
       QSS3BucketName: $[taskcat_autobucket]
