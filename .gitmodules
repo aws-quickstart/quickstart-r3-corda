@@ -9,3 +9,6 @@
 	path = submodules/quickstart-amazon-aurora-postgresql
 	url = git@github.com:aws-quickstart/quickstart-amazon-aurora-postgresql.git
 	branch = main
+[submodule "docs/boilerplate"]
+	path = docs/boilerplate
+	url = https://github.com/aws-quickstart/quickstart-documentation-base-common.git
