@@ -1,1 +1,17 @@
-// placeholder
+
+:template_aws_cloudformation_stack:
+:template_aws_ec2_instance:
+:template_aws_ec2_securitygroup:
+:template_aws_efs_filesystem:
+:template_aws_efs_mounttarget:
+:template_aws_elasticloadbalancing_loadbalancer:
+:template_aws_iam_instanceprofile:
+:template_aws_iam_policy:
+:template_aws_iam_role:
+:template_aws_logs_loggroup:
+:template_cloudformation:
+:template_ec2:
+:template_efs:
+:template_elasticloadbalancing:
+:template_iam:
+:template_logs:

@@ -1,1 +1,6 @@
-// placeholder
+
+=== Launch into a new VPC
+include::corda-master.adoc[]
+
+=== Launch into an existing VPC
+include::corda.adoc[]

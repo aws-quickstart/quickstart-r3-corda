@@ -1,14 +1,3 @@
-[submodule "submodules/quickstart-aws-vpc"]
-    path = submodules/quickstart-aws-vpc
-    url = ../../aws-quickstart/quickstart-aws-vpc.git
-[submodule "submodules/quickstart-linux-utilities"]
-    path = submodules/quickstart-linux-utilities
-    url = ../../aws-quickstart/quickstart-linux-utilities.git
-    branch = main
-[submodule "submodules/quickstart-amazon-aurora-postgresql"]
-	path = submodules/quickstart-amazon-aurora-postgresql
-	url = git@github.com:aws-quickstart/quickstart-amazon-aurora-postgresql.git
-	branch = main
 [submodule "docs/boilerplate"]
 	path = docs/boilerplate
 	url = https://github.com/aws-quickstart/quickstart-documentation-base-common.git
