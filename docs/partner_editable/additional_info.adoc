@@ -1,0 +1,22 @@
+// Add steps as necessary for accessing the software, post-configuration, and testing. Don’t include full usage instructions for your software, but add links to your product documentation for that information.
+//Should any sections not be applicable, remove them
+
+== Test the deployment
+
+You can test the deployment of your Corda node by following the steps in the documentation for http://docs.corda.r3.com/testnet-explorer.html[using the Node Explorer to test a Corda node on Corda Testnet].
+
+== Best practices for using {partner-product-short-name} on AWS
+
+Corda nodes need to stay in sync with their network of peers and ordering services. There are 2 key stores of state in the Corda node, the Corda Vault which is a SQL database hosted by the Amazon RDS PostgreSQL service and the message queue which is based on Artemis and is hosted on the shared Amazon EFS. The Quick Start template sets these up to be both backed up and shared between the primary and the backup instances of Corda.
+
+For details on the hot-cold deployment of Corda, see the http://docs.corda.r3.com/hot-cold-deployment.html[Corda documentation].
+
+You can configure the default retention period of database snapshots in the database configuration parameters in the Quick Start.
+
+Corda is also multi-threaded by default and will expand the number of workers to make use of the available vCPUs.
+
+== Security
+
+=== Key Management
+
+Corda utilizes public key infrastructure for transaction signing. Good key management process is important for the security of your applications and assets. By default, the node will connect to the Corda Testnet which auto generates keys and provisions these to your node. This is for convenience and demonstration purposes and must not be used for production use. Before running transactions with real assets, the node will need to http://docs.corda.r3.com/permissioning.html#keypair-and-certificate-formats[generate a secure key-pair] locally and http://docs.corda.r3.com/permissioning.html#connecting-to-a-compatibility-zone[register] with a production Corda network.

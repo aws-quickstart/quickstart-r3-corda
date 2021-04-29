@@ -35,6 +35,7 @@ Metadata:
           default: AWS Quick Start Configuration
         Parameters:
           - QSS3BucketName
+          - QSS3BucketRegion
           - QSS3KeyPrefix
     ParameterLabels:
       Location:
@@ -59,6 +60,8 @@ Metadata:
         default: Database master password
       QSS3BucketName:
         default: Quick Start S3 bucket name
+      QSS3BucketRegion:
+        default: Quick Start S3 bucket Region
       QSS3KeyPrefix:
         default: Quick Start S3 key prefix
       RemoteAccessCIDR:
@@ -144,6 +147,10 @@ Parameters:
       include numbers, lowercase letters, uppercase letters, and hyphens (-). It
       cannot start or end with a hyphen (-).
     Type: String
+  QSS3BucketRegion:
+    Default: 'us-east-1'
+    Description: 'AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. Keep the default Region unless you are customizing the template. Changing this Region updates code references to point to a new Quick Start location. When using your own bucket, specify the Region. See https://aws-quickstart.github.io/option1.html.'
+    Type: String
   QSS3KeyPrefix:
     AllowedPattern: '^[0-9a-zA-Z-/]*$'
     ConstraintDescription: >-
@@ -227,6 +234,7 @@ Conditions:
   GovCloudCondition: !Equals
     - !Ref AWS::Region
     - us-gov-west-1
+  UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
 Resources:
   FileSystem:
     Type: AWS::EFS::FileSystem
@@ -406,8 +414,7 @@ Resources:
       AWS::CloudFormation::Authentication:
         S3AccessCreds:
           type: S3
-          buckets:
-            - !Sub ${QSS3BucketName}
+          buckets: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
           roleName:
             Ref: CordaInstanceRole
       AWS::CloudFormation::Init:
@@ -449,12 +456,11 @@ Resources:
         systemd-config-corda:
           files:
             /etc/systemd/system/corda.service:
-              source: !Sub
-                - >-
-                  https://${QSS3BucketName}.${S3Region}.amazonaws.com/${QSS3KeyPrefix}scripts/corda.service
-                - QSS3BucketName: !Ref QSS3BucketName
-                  S3Region: !If [ GovCloudCondition, s3-us-gov-west-1, s3 ]
-                  QSS3KeyPrefix: !Ref QSS3KeyPrefix
+              source:
+                  !Sub
+                      - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}scripts/corda.service
+                      - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+                        S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
               mode: '000755'
               owner: root
               group: root
@@ -466,12 +472,11 @@ Resources:
               wget: []
           files:
             /home/ubuntu/install-node.sh:
-              source: !Sub
-                - >-
-                  https://${QSS3BucketName}.${S3Region}.amazonaws.com/${QSS3KeyPrefix}scripts/install-node.sh
-                - QSS3BucketName: !Ref QSS3BucketName
-                  S3Region: !If [ GovCloudCondition, s3-us-gov-west-1, s3 ]
-                  QSS3KeyPrefix: !Ref QSS3KeyPrefix
+              source:
+                  !Sub
+                      - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}scripts/install-node.sh
+                      - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+                        S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
               mode: '000755'
               owner: root
               group: root
@@ -515,12 +520,11 @@ Resources:
         run-corda-log-collection:
           files:
             /home/ubuntu/node-logs.sh:
-              source: !Sub
-                - >-
-                  https://${QSS3BucketName}.${S3Region}.amazonaws.com/${QSS3KeyPrefix}scripts/node-logs.sh
-                - QSS3BucketName: !Ref QSS3BucketName
-                  S3Region: !If [ GovCloudCondition, s3-us-gov-west-1, s3 ]
-                  QSS3KeyPrefix: !Ref QSS3KeyPrefix
+              source:
+                  !Sub
+                      - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}scripts/node-logs.sh
+                      - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+                        S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
               mode: '000755'
               owner: root
               group: root
@@ -567,7 +571,7 @@ Resources:
               cfn-signal -e 0 --stack ${AWS::StackName} --region ${AWS::Region} --resource CordaInstance
               exit 0
             }
-            S3URI=https://${QSS3BucketName}.${S3Region}.amazonaws.com/${QSS3KeyPrefix}
+            S3URI=https://${S3Bucket}.${S3Region}.amazonaws.com/${QSS3KeyPrefix}
             echo \'[Cloning: Load QuickStart Common Utils]\'
             #Once Repo is public (Use quickstart-linux-utilities submodue)
             until git clone https://github.com/aws-quickstart/quickstart-linux-utilities.git ; do echo "Retrying"; done
@@ -593,6 +597,7 @@ Resources:
             # Signal cfn-init (final check)
             [ $(qs_status) == 0 ] && cfn_success || cfn_fail
           - S3Region: !If [ GovCloudCondition, s3-us-gov-west-1, s3 ]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
   CordaColdInstance:
     Type: AWS::EC2::Instance
     DependsOn: CordaInstance
@@ -600,8 +605,7 @@ Resources:
       AWS::CloudFormation::Authentication:
         S3AccessCreds:
           type: S3
-          buckets:
-            - !Sub ${QSS3BucketName}
+          buckets: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
           roleName:
             Ref: CordaInstanceRole
       AWS::CloudFormation::Init:
@@ -635,12 +639,11 @@ Resources:
         systemd-config-corda:
           files:
             /etc/systemd/system/corda.service:
-              source: !Sub
-                - >-
-                  https://${QSS3BucketName}.${S3Region}.amazonaws.com/${QSS3KeyPrefix}scripts/corda.service
-                - QSS3BucketName: !Ref QSS3BucketName
-                  S3Region: !If [ GovCloudCondition, s3-us-gov-west-1, s3 ]
-                  QSS3KeyPrefix: !Ref QSS3KeyPrefix
+              source:
+                  !Sub
+                      - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}scripts/corda.service
+                      - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+                        S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
               mode: '000755'
               owner: root
               group: root
@@ -652,12 +655,11 @@ Resources:
               wget: []
           files:
             /home/ubuntu/install-node-cold-node.sh:
-              source: !Sub
-                - >-
-                  https://${QSS3BucketName}.${S3Region}.amazonaws.com/${QSS3KeyPrefix}scripts/install-cold-node.sh
-                - QSS3BucketName: !Ref QSS3BucketName
-                  S3Region: !If [ GovCloudCondition, s3-us-gov-west-1, s3 ]
-                  QSS3KeyPrefix: !Ref QSS3KeyPrefix
+              source:
+                  !Sub
+                      - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}scripts/install-cold-node.sh
+                      - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+                        S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
               mode: '000755'
               owner: root
               group: root
@@ -701,12 +703,11 @@ Resources:
         run-corda-log-collection:
           files:
             /home/ubuntu/node-logs.sh:
-              source: !Sub
-                - >-
-                  https://${QSS3BucketName}.${S3Region}.amazonaws.com/${QSS3KeyPrefix}scripts/node-logs.sh
-                - QSS3BucketName: !Ref QSS3BucketName
-                  S3Region: !If [ GovCloudCondition, s3-us-gov-west-1, s3 ]
-                  QSS3KeyPrefix: !Ref QSS3KeyPrefix
+              source:
+                  !Sub
+                      - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}scripts/node-logs.sh
+                      - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+                        S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
               mode: '000755'
               owner: root
               group: root
@@ -753,7 +754,7 @@ Resources:
               cfn-signal -e 0 --stack ${AWS::StackName} --region ${AWS::Region} --resource CordaColdInstance
               exit 0
             }
-            S3URI=https://${QSS3BucketName}.${S3Region}.amazonaws.com/${QSS3KeyPrefix}
+            S3URI=https://${S3Bucket}.${S3Region}.amazonaws.com/${QSS3KeyPrefix}
             echo \'[Cloning: Load QuickStart Common Utils]\'
             #Once Repo is public (Use quickstart-linux-utilities submodue)
             until git clone https://github.com/aws-quickstart/quickstart-linux-utilities.git ; do echo "Retrying"; done
@@ -779,6 +780,7 @@ Resources:
             # Signal cfn-init (final check)
             [ $(qs_status) == 0 ] && cfn_success || cfn_fail
           - S3Region: !If [ GovCloudCondition, s3-us-gov-west-1, s3 ]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
 Outputs:
   CordaInstancePublicDnsName:
     Value: !GetAtt
