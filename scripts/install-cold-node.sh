@@ -92,6 +92,7 @@ cp "/opt/corda/sharedfs/corda.zip" "/opt/corda/"
 
 log "Unpacking distribution ..."
 
+rm -rf certificates
 sudo unzip -o /opt/corda/corda.zip || error "Unable to unzip generated node bundle; was the correct one time download key used?"
 
 log "Setting permissions for node directories ..."
